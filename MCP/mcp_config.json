@@ -1,0 +1,20 @@
+{
+    "mcpServers": {
+        "desktop-commander": {
+            "command": "node",
+            "args": [
+                "./node_modules/@wonderwhy-er/desktop-commander/dist/index.js"
+            ]
+        }
+    },
+    "models": [
+        {
+            "model": "qwen3:0.6b",
+            "default": true,
+            "provider": "openai",
+            "apiKey": "ollama",
+            "apiBase": "http://localhost:11434/v1/",
+            "max_tokens": 2000
+        }
+    ]
+}
