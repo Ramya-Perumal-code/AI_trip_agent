@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "data": {
+    "markdown": "# Venice: Grand Canal Gondola Ride\n\nVenice: Grand Canal Gondola Ride...",
+    "metadata": {
+      "source": "GetYourGuide API",
+      "id": "mock_id"
+    },
+    "json": {
+      "Attraction_name": "Venice: Grand Canal Gondola Ride",
+      "Why visit": [
+        "Glide down the Grand Canal",
+        "See historic palazzos"
+      ],
+      "What included": [
+        "Gondola ride",
+        "Live commentary"
+      ],
+      "What not included": [
+        "Food and drink",
+        "Hotel pickup"
+      ],
+      "Restrictions": [
+        "No large bags"
+      ],
+      "Location": [
+        "Meeting Point: St. Mark's Square, by the column "
+      ],
+      "User Rating": "4.8 stars",
+      "Duration": "30 minutes",
+      "additional Information": [
+        "Ride is shared with others",
+        "Weather dependent"
+      ]
+    }
+  }
+}

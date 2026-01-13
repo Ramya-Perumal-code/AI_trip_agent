@@ -153,3 +153,5 @@ cython_debug/
 chat_history.db
 response.json
 trip_rag_name/
+node_modules/
+frontend/node_modules/
