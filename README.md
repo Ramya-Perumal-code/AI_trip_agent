@@ -67,20 +67,20 @@ The system employs a collaborative multi-agent architecture:
 *   **Primary Objective**: To trigger specialized agents in sequence and merge their intelligence.
 *   **Strategy**: Executes `TravelResearchAgent` for the base narrative and `AdditionalInfoAgent` for deep-dive metadata, ensuring no detail is missed.
 
-### 2. `TravelResearchAgent` (The Orchestrator - Internal)
+### 2. `TravelResearchAgent` (The Synthesis Engine)
 *   **Role**: Expert Travel Researcher & Synthesis Specialist.
 *   **Primary Objective**: To consolidate information from multiple sources into a comprehensive, human-readable response.
 *   **Strategy**: 
-    - **Pre-Processing**: Filters RAG results using a **0.5 similarity threshold** to ensure accuracy.
-    - **Context Assembly**: Sequentially triggers RAG and `AdditionalInfoAgent` logic before deciding if a Web fallback is necessary.
+    - **Pre-Processing**: Filters RAG results using a **0.5 similarity threshold** and a **Strict Relevance Guard** to ensure accuracy.
+    - **Context Assembly**: Sequentially triggers RAG search and Web fallback (if RAG is insufficient) to gather all necessary travel details.
     - **Formatting**: Strictly enforces Markdown structure for the UI.
 
 ### 2. `AdditionalInfoAgent` (The Data Specialist)
 *   **Role**: Targeted Metadata Extractor.
 *   **Primary Objective**: To find specific "hidden" details like ticketing rules, duration, and restrictions.
 *   **Strategy**:
-    - **Depth Over Breadth**: Focuses on structured metadata fields (`additional Information`) within RAG documents that general searches might overlook.
-    - **Technical Extraction**: Specifically tasked with formatting disparate data points into standardized bullet points for the Orchestrator.
+    - **Depth Over Breadth**: Focuses on structured metadata fields (`additional Information`) within RAG documents using a **Strict Relevance Guard**.
+    - **LLM Synthesis**: Uses the LLM (Ollama) to rewrite fragmented metadata into a professional, concise summary for the traveler.
 
 ## 📅 Development Timeline
 
