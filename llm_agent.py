@@ -27,9 +27,10 @@ def is_relevant(query: str, attraction_name: str) -> bool:
         
     return False
 
-def TravelResearchAgent(query: str) -> str:
+def TravelResearchAgent(query: str, additional_info: str = None) -> str:
     """
     Research agent that gathers information from RAG and Web to answer travel queries.
+    It can also take optional pre-gathered additional information to synthesize into the final response.
     """
 
     print(f"🔍 [TravelResearchAgent] Processing query: {query}")
@@ -141,8 +142,9 @@ def TravelResearchAgent(query: str) -> str:
     user_content = (
         f"User Query: {query}\n\n"
         f"### RAG Information:\n{rag_info if rag_info else 'No RAG info available.'}\n\n"
+        f"### Additional Details (Metadata):\n{additional_info if additional_info else 'No specific additional details provided.'}\n\n"
         f"### Web Information:\n{web_info if web_info else 'No Web info available.'}\n\n"
-        "Please provide a comprehensive answer."
+        "Please provide a comprehensive, unified answer that incorporates the additional details into the main narrative."
     )
 
     try:
@@ -293,21 +295,20 @@ def OrchestrateAgent(query: str) -> str:
     """
     print(f"🤖 [OrchestrateAgent] Coordinating agents for query: {query}")
     
-    # 1. Get the primary research/synthesis
-    main_research = TravelResearchAgent(query)
-    
-    # 2. Get specific additional details
+    # 1. Get specific additional details first (The Specialist)
     supplementary_info = AdditionalInfoAgent(query)
     
-    # 3. Combine responses
-    combined_response = main_research
+    # Check if we got real info or just a 'not found' message
+    if not supplementary_info or "no specific additional information found" in supplementary_info.lower():
+        supplementary_info = None
+
+    # 2. Get the primary research/synthesis (The Engine) 
+    # and feed the supplementary info into it
+    final_response = TravelResearchAgent(query, additional_info=supplementary_info)
     
-    if supplementary_info and "no specific additional info found" not in supplementary_info.lower():
-        combined_response += f"\n\n---\n### ℹ️ Supplementary Information\n{supplementary_info}"
-        
-    return combined_response
+    return final_response
 
 if __name__ == "__main__":
     # Simple test
-    q = "tell me about taj mahal"
+    q = "tell me about madame tussauds"
     print(OrchestrateAgent(q))

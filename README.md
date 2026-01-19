@@ -8,10 +8,10 @@ An advanced, intelligent travel assistant that combines **local knowledge (RAG)*
     *   **Web Fallback**: Uses **DuckDuckGo** to fill in gaps if local data is missing.
 *   **Modern Interactive UI**: professional React/Vite frontend with a chat interface.
 *   **Dual-Agent Orchestration**:
-    *   `OrchestrateAgent`: High-level coordinator that manages specialized agents.
-    *   `TravelResearchAgent`: Analyzes complex queries and synthesizes a full answer.
-    *   `AdditionalInfoAgent`: Specialized agent for extracting specific details from RAG.
-*   **API-First Design**: Built on **FastAPI**, exposing clean REST endpoints (`/health`, `/final-response`, `/additional-info`).
+    *   `OrchestrateAgent`: High-level coordinator that manages the sequential flow of specialized agents.
+    *   `AdditionalInfoAgent`: Specialized agent for extracting specific details from RAG first.
+    *   `TravelResearchAgent`: Synthesizes a full answer using the gathered metadata and additional research.
+*   **API-First Design**: Built on **FastAPI**, exposing clean REST endpoints (`/health`, `/api/v1/final-response`, `/api/v1/additional-info`).
 
 ## 🏗️ High Level Architecture
 
@@ -23,21 +23,21 @@ graph TD
     subgraph "Travel Agent Engine"
         Backend --> Orchestrator[OrchestrateAgent]
         
-        Orchestrator --> AgentA["TravelResearchAgent (LLM)"]
-        Orchestrator --> AgentB["AdditionalInfoAgent (LLM)"]
+        Orchestrator -- "1. Gather Metadata" --> AgentB["AdditionalInfoAgent (LLM)"]
+        AgentB --> RAG[(RAG Store)]
+        AgentB --> Web[Web Search]
         
-        AgentA --> RAG[(RAG Store)]
-        AgentA --> Web[Web Search]
+        AgentB -. "2. Metadata" .-> Orchestrator
         
-        AgentB --> RAG
-        AgentB --> Web
+        Orchestrator -- "3. Synthesize Answer" --> AgentA["TravelResearchAgent (LLM)"]
+        AgentA --> RAG
+        AgentA --> Web
+        
+        AgentA -. "4. Final Result" .-> Orchestrator
         
         AgentA --- LLM((Ollama LLM))
         AgentB --- LLM
     end
-    
-    AgentA -.->|Combined Result| Orchestrator
-    AgentB -.->|Combined Result| Orchestrator
 ```
 
 ## 🧠 AI & Agentic Concepts
@@ -69,14 +69,14 @@ The system employs a collaborative multi-agent architecture:
 ### 1. `OrchestrateAgent` (The Coordinator)
 *   **Role**: Primary entry point for all research requests.
 *   **Primary Objective**: To trigger specialized agents in sequence and merge their intelligence.
-*   **Strategy**: Executes `TravelResearchAgent` for the base narrative and `AdditionalInfoAgent` for deep-dive metadata, ensuring no detail is missed.
+*   **Strategy**: Executes `AdditionalInfoAgent` first to extract deep-dive metadata, then passes this context to `TravelResearchAgent` to ensure the final narrative is enriched with specific details.
 
 ### 2. `TravelResearchAgent` (The Synthesis Engine)
 *   **Role**: Expert Travel Researcher & Synthesis Specialist.
 *   **Primary Objective**: To consolidate information from multiple sources into a comprehensive, human-readable response.
 *   **Strategy**: 
     - **Pre-Processing**: Filters RAG results using a **0.5 similarity threshold** and a **Strict Relevance Guard** to ensure accuracy.
-    - **Context Assembly**: Sequentially triggers RAG search and Web fallback (if RAG is insufficient) to gather all necessary travel details.
+    - **Context Assembly**: Integrates pre-gathered metadata from `AdditionalInfoAgent` with its own RAG search and Web fallback (if RAG is insufficient) to synthesize a complete answer.
     - **Formatting**: Strictly enforces Markdown structure for the UI.
 
 ### 2. `AdditionalInfoAgent` (The Data Specialist)
@@ -104,7 +104,7 @@ The system employs a collaborative multi-agent architecture:
 ## 🛠️ Tech Stack
 *   **Backend**: Python, FastAPI, Uvicorn
 *   **Frontend**: React, TypeScript, Vite, TailwindCSS
-*   **AI/LLM**: Ollama (running local models like `qwen2.5`)
+*   **AI/LLM**: Ollama (running local models like `qwen3:0.6b`)
 *   **Data**: Qdrant (Vector Store/RAG), DuckDuckGo (Web), Firecrawl (Scraping)
 
 ## 🛠️ Environment Setup
@@ -142,7 +142,8 @@ If you want to add new attractions to the Knowledge Base:
 ## 🧪 Testing
 You can test the agent in three ways:
 1.  **Chat Interface**: Just type in the frontend chat box!
-2.  **Browser URL**: 
-    - **Main Response**: `http://localhost:3000/api/v1/final-response?query=Venice`
-    - **Additional Info**: `http://localhost:3000/api/v1/additional-info?query=Venice`
+2.  **Browser URL (Direct API)**: 
+    - **Main Response**: `http://localhost:8000/api/v1/final-response?query=Venice`
+    - **Additional Info**: `http://localhost:8000/api/v1/additional-info?query=Venice`
+    - **Test Browser**: `http://localhost:8000/api/v1/test-browser?query=Venice`
 3.  **Swagger UI**: Visit `http://localhost:8000/docs`.
