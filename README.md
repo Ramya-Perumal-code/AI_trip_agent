@@ -142,5 +142,7 @@ If you want to add new attractions to the Knowledge Base:
 ## 🧪 Testing
 You can test the agent in three ways:
 1.  **Chat Interface**: Just type in the frontend chat box!
-2.  **Browser URL**: `http://localhost:3000/api/v1/final-response?query=Venice`
+2.  **Browser URL**: 
+    - **Main Response**: `http://localhost:3000/api/v1/final-response?query=Venice`
+    - **Additional Info**: `http://localhost:3000/api/v1/additional-info?query=Venice`
 3.  **Swagger UI**: Visit `http://localhost:8000/docs`.
