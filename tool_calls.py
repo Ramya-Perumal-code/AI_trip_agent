@@ -1,12 +1,14 @@
 from langchain_huggingface import HuggingFaceEmbeddings
-
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 from langchain_community.tools import DuckDuckGoSearchRun
 import json
 import os
+from dotenv import load_dotenv
 import atexit
+
+load_dotenv()
 
 # Ensure ddgs is available for DuckDuckGoSearchRun
 try:
@@ -43,9 +45,19 @@ except ImportError:
 
 #----------------------------IMPORTING LIBRARIES----------------------------
 
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+
+# Use HuggingFace Embeddings (CPU) for both Local and Cloud for now
+# Groq doesn't support embeddings yet, and HF is free/reliable
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
-client = QdrantClient(path="trip_rag_name")
+if QDRANT_URL and QDRANT_API_KEY:
+    print("🚀 Connecting to Qdrant Cloud")
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+else:
+    print("🏠 Using Local Qdrant Store")
+    client = QdrantClient(path="trip_rag_name")
 
 
 def search_rag(query: str = "San Diego Zoo Day Pass?", k: int = 1) -> list:

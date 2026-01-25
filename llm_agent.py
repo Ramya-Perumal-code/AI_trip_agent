@@ -1,6 +1,18 @@
 import ollama
 import json
+import os
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
 from tool_calls import search_rag, duckduckgo_search
+
+load_dotenv()
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if GROQ_API_KEY:
+    print("🚀 Using Groq (Llama 3) LLM")
+    llm = ChatGroq(temperature=0, model_name="llama3-70b-8192", api_key=GROQ_API_KEY)
+else:
+    print("🏠 Using Local Ollama LLM")
 
 def is_relevant(query: str, attraction_name: str) -> bool:
     """
@@ -148,14 +160,22 @@ def TravelResearchAgent(query: str, additional_info: str = None) -> str:
     )
 
     try:
-        response = ollama.chat(
-            model="qwen3:0.6b",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_content}
+        if GROQ_API_KEY:
+            messages = [
+                ("system", system_prompt),
+                ("human", user_content),
             ]
-        )
-        return response['message']['content']
+            response = llm.invoke(messages)
+            return response.content
+        else:
+            response = ollama.chat(
+                model="qwen3:0.6b",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content}
+                ]
+            )
+            return response['message']['content']
     except Exception as e:
         return f"Error generating response: {e}"
 
@@ -277,14 +297,22 @@ def AdditionalInfoAgent(query: str) -> str:
         
         user_content = f"Attraction Query: {query}\n\nRaw Metadata gathered:\n{raw_info}"
         
-        response = ollama.chat(
-            model="qwen3:0.6b",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_content}
+        if GROQ_API_KEY:
+            messages = [
+                ("system", system_prompt),
+                ("human", user_content),
             ]
-        )
-        return response['message']['content']
+            response = llm.invoke(messages)
+            return response.content
+        else:
+            response = ollama.chat(
+                model="qwen3:0.6b",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content}
+                ]
+            )
+            return response['message']['content']
         
     except Exception as e:
         return f"Error gathering info: {e}"
