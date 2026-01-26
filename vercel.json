@@ -1,10 +1,5 @@
 {
     "version": 2,
-    "functions": {
-        "api/index.py": {
-            "includeFiles": "llm_agent.py,tool_calls.py,gyg_fetcher.py"
-        }
-    },
     "rewrites": [
         {
             "source": "/api/(.*)",
