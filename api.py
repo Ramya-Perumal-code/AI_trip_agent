@@ -126,14 +126,14 @@ async def root():
         "message": "Trip Agent API",
         "version": "1.0.0",
         "endpoints": {
-            "health": "/health",
-            "final_response": "/v1/final-response",
-            "additional_info": "/v1/additional-info"
+            "health": "/api/health",
+            "final_response": "/api/v1/final-response",
+            "additional_info": "/api/v1/additional-info"
         }
     }
 
 
-@app.get("/health", tags=["General"])
+@app.get("/api/health", tags=["General"])
 async def health_check():
     """
     Health check endpoint to verify API is running and check environment variables.
@@ -159,7 +159,7 @@ async def health_check():
 
 
 @app.post(
-    "/v1/final-response",
+    "/api/v1/final-response",
     response_model=FinalResponseResponse,
     status_code=status.HTTP_200_OK,
     tags=["Agents"],
@@ -226,7 +226,7 @@ async def generate_final_response(request: FinalResponseRequest):
 
 
 @app.get(
-    "/v1/final-response",
+    "/api/v1/final-response",
     tags=["Agents"],
     summary="Generate Final Response (GET)",
     description="Browser-friendly GET version of the final response agent."
@@ -249,7 +249,7 @@ async def generate_final_response_get(query: str):
         return {"success": False, "error": str(e)}
 
 @app.post(
-    "/v1/additional-info",
+    "/api/v1/additional-info",
     response_model=AdditionalInfoResponse,
     status_code=status.HTTP_200_OK,
     tags=["Agents"],
@@ -311,7 +311,7 @@ async def gather_additional_info(request: AdditionalInfoRequest):
 
 
 @app.get(
-    "/v1/additional-info",
+    "/api/v1/additional-info",
     tags=["Agents"],
     summary="Gather Additional Information (GET)",
     description="Browser-friendly GET version of the additional info agent."
@@ -335,7 +335,7 @@ async def gather_additional_info_get(query: str):
         return {"success": False, "error": str(e)}
 
 @app.get(
-    "/v1/test-browser",
+    "/api/v1/test-browser",
     tags=["Testing"],
     summary="Browser Test Endpoint (GET)",
     description="Allows testing the agent directly from the browser address bar."
