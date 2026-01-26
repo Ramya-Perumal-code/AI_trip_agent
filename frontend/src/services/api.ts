@@ -55,7 +55,7 @@ export const apiService = {
     request: FinalResponseRequest
   ): Promise<FinalResponseResponse> {
     const response = await api.post<FinalResponseResponse>(
-      '/v1/final-response',
+      '/api/v1/final-response',
       request
     );
     return response.data;
@@ -66,7 +66,7 @@ export const apiService = {
     request: AdditionalInfoRequest
   ): Promise<AdditionalInfoResponse> {
     const response = await api.post<AdditionalInfoResponse>(
-      '/v1/additional-info',
+      '/api/v1/additional-info',
       request
     );
     return response.data;
