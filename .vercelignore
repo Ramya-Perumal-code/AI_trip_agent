@@ -1,0 +1,24 @@
+# Exclude everything by default
+*
+
+# Allow only necessary backend files
+!api/
+!api/index.py
+!llm_agent.py
+!tool_calls.py
+!requirements.txt
+!vercel.json
+!.env
+!gyg_fetcher.py
+
+# Explicitly exclude large/unnecessary folders even if allowed above
+frontend/
+node_modules/
+.venv/
+__pycache__/
+dataset_json/
+MCP/
+.git/
+*.db
+*.pyc
+*.lock

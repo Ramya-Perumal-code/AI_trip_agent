@@ -1,4 +1,7 @@
-import ollama
+try:
+    import ollama
+except ImportError:
+    ollama = None
 import json
 import os
 from dotenv import load_dotenv
