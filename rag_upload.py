@@ -1,36 +1,46 @@
+import json
+import os
+import shutil
+from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 from langchain_core.documents import Document
-import json
-import os
-import shutil
+
+load_dotenv()
 
 #----------------------------IMPORTING LIBRARIES----------------------------
 
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
-# Initialize client with error handling for corrupted metadata
-# Check if folder exists and has corrupted metadata, delete it before initializing
-if os.path.exists("trip_rag_name"):
-    try:
-        # Try to initialize client - if it fails, the metadata is corrupted
-        test_client = QdrantClient(path="trip_rag_name")
-        test_client.get_collections()  # Try to access collections
-        client = test_client
-    except Exception as e:
-        # Metadata is corrupted, delete and recreate
-        print(f"Warning: Corrupted collection detected ({e}). Removing and recreating...")
-        try:
-            shutil.rmtree("trip_rag_name")
-            print("Removed corrupted collection folder.")
-        except Exception as cleanup_error:
-            print(f"Could not remove corrupted folder: {cleanup_error}")
-            raise
-        client = QdrantClient(path="trip_rag_name")
+# Initialize client with cloud support and error handling for corrupted local metadata
+if QDRANT_URL and QDRANT_API_KEY:
+    print("🚀 Connecting to Qdrant Cloud for Upload")
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 else:
-    client = QdrantClient(path="trip_rag_name")
+    print("🏠 Using Local Qdrant Store for Upload")
+    if os.path.exists("trip_rag_name"):
+        try:
+            # Try to initialize client - if it fails, the metadata is corrupted
+            test_client = QdrantClient(path="trip_rag_name")
+            test_client.get_collections()  # Try to access collections
+            client = test_client
+        except Exception as e:
+            # Metadata is corrupted, delete and recreate
+            print(f"Warning: Corrupted collection detected ({e}). Removing and recreating...")
+            try:
+                shutil.rmtree("trip_rag_name")
+                print("Removed corrupted collection folder.")
+            except Exception as cleanup_error:
+                print(f"Could not remove corrupted folder: {cleanup_error}")
+                raise
+            client = QdrantClient(path="trip_rag_name")
+    else:
+        client = QdrantClient(path="trip_rag_name")
 
 def upload_memory_rag(text: str):
     # client = QdrantClient(path="memory_rag")
